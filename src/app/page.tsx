@@ -167,3 +167,161 @@ export default function Home() {
               디자이너와 개발자 간 UI 컴포넌트 핸드오프 오차를 줄이는 단일 진실 공급원(SSOT) 툴입니다.
             </p>
           </header>
+
+          <div className="space-y-5 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+            <div className="space-y-1">
+              <div className="text-xs font-medium text-slate-600">Button Label</div>
+              <input
+                type="text"
+                value={buttonText}
+                onChange={(e) => setButtonText(e.target.value)}
+                placeholder="Primary Button"
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-slate-900"
+              />
+            </div>
+
+            {/* 둥글기 컨트롤러 */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-600">
+                <span>둥글기 (Radius)</span>
+                <span>{radius}px</span>
+              </div>
+              <input
+                type="range" min={0} max={32} value={radius}
+                onChange={(e) => setRadius(Number(e.target.value))}
+                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-slate-900"
+                aria-label="Border Radius"
+              />
+            </div>
+
+            {/* 가로 여백 컨트롤러 */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-600">
+                <span>가로 여백 (Padding X)</span>
+                <span>{paddingX}px</span>
+              </div>
+              <input
+                type="range" min={8} max={48} value={paddingX}
+                onChange={(e) => setPaddingX(Number(e.target.value))}
+                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-slate-900"
+                aria-label="Padding Horizontal"
+              />
+            </div>
+
+            {/* 세로 여백 컨트롤러 */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-600">
+                <span>세로 여백 (Padding Y)</span>
+                <span>{paddingY}px</span>
+              </div>
+              <input
+                type="range" min={4} max={24} value={paddingY}
+                onChange={(e) => setPaddingY(Number(e.target.value))}
+                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-slate-900"
+                aria-label="Padding Vertical"
+              />
+            </div>
+
+            {/* 폰트 선택 */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-slate-600">Font Family</div>
+              <div className="flex gap-2">
+                {FONT_FAMILIES.map((font) => (
+                  <button
+                    key={font.id}
+                    onClick={() => setFontFamilyId(font.id as any)}
+                    className={`rounded-lg border px-3 py-2 text-xs font-medium ${fontFamilyId === font.id ? "bg-slate-900 text-white" : "bg-white"}`}
+                  >
+                    {font.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 컬러 팔레트 */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-slate-600">Color Palette</div>
+              <div className="flex flex-wrap gap-2">
+                {BG_COLORS.map((color) => (
+                  <button
+                    key={color.id}
+                    onClick={() => setColorId(color.id)}
+                    className={`h-8 w-8 rounded-full border-2 ${color.className.split(" ")[0]} ${colorId === color.id ? "border-slate-900 ring-2 ring-offset-2" : "border-slate-200"}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* AI 네이밍 버튼 */}
+            <div className="mt-6 border-t border-dashed border-slate-200 pt-4 flex items-center justify-between">
+              <p className="text-xs font-medium text-slate-600">✨ AI Naming Assistant</p>
+              <button
+                onClick={handleGenerateName}
+                disabled={isGeneratingName}
+                className="rounded-full bg-slate-900 px-4 py-1.5 text-xs text-white disabled:opacity-50"
+              >
+                {isGeneratingName ? "생성 중..." : "AI 추천 받기"}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* 프리뷰 섹션 */}
+        <section className="w-full space-y-6 lg:w-1/2" aria-label="Live Preview">
+          <div className="flex flex-col items-center justify-center gap-8 rounded-xl bg-slate-50 p-10 ring-1 ring-slate-200">
+            <button
+              style={{
+                borderRadius: `${radius}px`,
+                padding: `${paddingY}px ${paddingX}px`,
+                fontSize: `${fontSize}px`,
+              }}
+              className={`${buttonClasses} ${selectedBg.className} ${selectedTextColor.className} ${selectedFont.className}`}
+            >
+              {buttonText || "Button"}
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Export Code</p>
+              <button
+                onClick={handleCopy}
+                className="rounded-full bg-slate-900 px-4 py-1.5 text-xs text-white hover:bg-slate-800 transition-all"
+              >
+                {copyCodeStatus}
+              </button>
+            </div>
+
+            {aiSuggestedName && (
+              <button
+                onClick={handleCopySuggestedName}
+                className="flex w-full items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-emerald-700 hover:bg-emerald-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase">AI Suggested Name</span>
+                  <span className="font-mono text-sm font-bold">{aiSuggestedName}</span>
+                </div>
+                <span className="text-[10px] opacity-70">{copyNameStatus}</span>
+              </button>
+            )}
+
+            <div className="rounded-lg bg-slate-900 p-4 text-xs text-slate-300 font-mono overflow-x-auto shadow-inner">
+              <pre>
+{`<button
+  className="${tailwindPreview}"
+  style={{
+    borderRadius: "${radius}px",
+    padding: "${paddingY}px ${paddingX}px",
+    fontSize: "${fontSize}px"
+  }}
+>
+  ${buttonText || "Button"}
+</button>`}
+              </pre>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
