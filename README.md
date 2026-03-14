@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Design Token Handoff Studio
 
-## Getting Started
+> 디자이너와 개발자 간의 UI 컴포넌트 핸드오프(Handoff) 오차를 줄이고, 완벽한 단일 진실 공급원(SSOT)을 제공하는 디자인 토큰 스튜디오
 
-First, run the development server:
+## 기획 의도
+
+### Problem: 핸드오프 과정에서 발생하는 미세한 오차와 커뮤니케이션 낭비
+
+디자이너가 Figma 등 디자인 툴에서 정의한 수치(색상, 여백, 둥글기, 폰트 크기 등)는 보통 추상적인 스펙 문서나 구두 설명을 통해 개발자에게 전달됩니다.  
+이 과정에서 다음과 같은 문제가 반복해서 발생합니다.
+
+- 디자인 토큰 값이 구체적인 코드 수준까지 내려오지 않아, 개발자가 임의로 값을 근사치로 해석
+- "조금 더 둥글게", "살짝 여백 늘려주세요" 같은 추상적인 피드백이 여러 번 오가며 시간 소모
+- 실제 구현된 UI가 디자인 시스템 문서와 미세하게 어긋나고, 이 차이가 쌓여 품질 저하로 이어짐
+
+### Solution: 브라우저 상에서의 토큰 기반 Handoff & Visual QA
+
+**Design Token Handoff Studio**는 디자이너와 개발자 모두가 브라우저에서 동일한 UI 컴포넌트를 바라보며, 토큰 단위로 핸드오프를 진행할 수 있는 툴입니다.
+
+- 디자이너는 브라우저 상에서 직접 디자인 토큰(둥글기, 패딩, 컬러, 폰트 등)을 조작하면서 시각적인 QA를 수행합니다.
+- 조정된 결과는 **Tailwind CSS 클래스**와 **CSS 인라인 스타일(또는 디자인 토큰 오브젝트)**로 즉시 컴파일되어, 개발자는 복사 후 바로 코드베이스에 붙여넣을 수 있습니다.
+- 이 과정을 통해 **"디자인 → 구현" 사이의 미세한 숫자 오차를 제거**하고, 실제 코드가 곧 디자인 시스템의 한 조각이 되는 **단일 진실 공급원(SSOT, Single Source of Truth)**을 지향합니다.
+
+## 핵심 기능
+
+### 실시간 디자인 토큰 조절
+- Border Radius, Horizontal/Vertical Padding, Font Size 등 핵심 토큰을 슬라이더와 숫자 입력 박스로 정교하게 조절
+- Tailwind 컬러 스케일을 기반으로 한 확장 컬러 팔레트 및 텍스트 컬러 선택
+- Sans / Serif / Mono 폰트 패밀리 토글로 타입 스케일 실험
+
+### 코드 추출 (Compiled Code Handoff)
+- 현재 토큰 상태를 기반으로 한 Tailwind CSS 클래스 문자열 자동 생성
+- `style={{ ... }}` 형태의 인라인 스타일(디자인 토큰 오브젝트)까지 함께 제공하여, 디자인 시스템 또는 컴포넌트 라이브러리에 바로 반영 가능
+- 단일 `<button>` JSX 스니펫으로 추출되어, 핸드오프 이후의 개발자 작업 시간을 최소화
+
+### Live Component Preview
+- 브라우저 기본 버튼을 기준(baseline)으로, 토큰이 적용된 최종 컴포넌트를 실시간 비교
+- 토큰 변경 시 즉시 반영되는 라이브 컴포넌트를 통해, 디자이너·개발자가 동일한 결과물을 공유
+
+## 왜 이 툴이 필요한가?
+
+| 기존 방식 | Design Token Handoff Studio |
+|---|---|
+| 디자이너 → Figma → 개발자 전달 → 구현 → 피드백 루프 | 디자이너가 브라우저에서 토큰 조절 → 컴파일된 코드 즉시 추출 |
+| 추상적인 디자인 명세 ("조금만 더 둥글게") | 구체적인 수치 (`border-radius: 12px`, `padding: 10px 20px`) |
+| 반복적인 핑퐁 커뮤니케이션과 해석 차이 | 토큰과 코드가 1:1로 매핑된 단일 진실 공급원(SSOT) |
+
+## 기술 스택
+
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
+- **State**: React Hooks (useState, useCallback)
+
+## 로컬 실행
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` 에서 확인하세요.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 기여 방법
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+디자인 시스템 프리셋 추가, 새로운 토큰 카테고리 제안 등 PR 환영합니다.
+기여 전 `CLAUDE.md`의 코딩 컨벤션을 먼저 확인해 주세요.
 
-## Learn More
+## 접근성(Accessibility) 고려사항
 
-To learn more about Next.js, take a look at the following resources:
+이 프로젝트는 해커톤 데모 수준을 넘어, 실제 프로덕션 환경에서도 사용할 수 있는 디자인 시스템 툴을 목표로 합니다. 이를 위해 다음과 같은 접근성 원칙을 적극적으로 반영했습니다.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **색상 대비(Contrast) 준수**
+  - 버튼 배경색·텍스트 색상 조합은 WCAG 가이드라인의 명도 대비를 기본적으로 고려한 팔레트(Tailwind의 `slate`, `blue`, `emerald`, `amber`, `red`, `indigo` 등)로 구성했습니다.
+  - 텍스트 컬러를 `White` / `Slate-900` 중에서 선택할 수 있게 하여, 극단적으로 읽기 어려운 조합을 피하고, 디자이너가 명도 대비를 쉽게 확보하도록 돕습니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **키보드 탭(Tab) 이동과 포커스링(focus ring)**
+  - 모든 인터랙티브 요소(슬라이더, 토글 버튼, 팔레트 색상, 코드 복사 버튼 등)는 기본적인 키보드 탭 포커스를 지원합니다.
+  - Tailwind의 `focus-visible` 유틸리티와 `focus:ring-2 focus:ring-offset-2` 패턴을 사용해, 마우스 사용자에게는 과도한 시각적 노이즈를 주지 않으면서도 키보드 사용자는 선명한 포커스 링을 확인할 수 있습니다.
+  - 색상만으로 포커스 상태를 구분하지 않도록, `ring-offset`과 굵기(2px)를 함께 사용해 시각적으로 명확한 포커스를 제공합니다.
 
-## Deploy on Vercel
+- **스크린 리더를 위한 aria-* 속성 적용**
+  - 90년대 스타일의 `UGLY BUTTON`과 구조된 버튼에는 역할과 상태를 설명할 수 있는 텍스트를 포함하여, 시각적인 표현만 봐서는 이해하기 어려운 UX를 스크린 리더가 설명할 수 있도록 설계했습니다.
+  - 주요 컨트롤(예: 코드 복사 버튼)은 `aria-label`을 통해 "현재 디자인 토큰으로 버튼 코드를 복사"와 같이 동작을 설명해, 스크린 리더 사용자도 동일한 작업 플로우를 따를 수 있습니다.
+  - 이후 단계에서는 버튼 상태(hover, disabled, loading 등)에 대해 `aria-pressed`, `aria-busy` 등을 활용한 상태 표현을 확장할 계획입니다.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 검증 계획 (Validation Plan)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. 사용성 테스트: 코드 적용 시간 단축 A/B 테스트
+
+- **목표**
+  - `Design Token Handoff Studio`를 사용했을 때, 프론트엔드 개발자가 피그마/디자인 시안을 보고 직접 버튼 스타일을 구현하는 기존 방식 대비 **"코드 추출 후 실제 프로젝트 적용까지 걸리는 시간"을 의미 있게 단축**하는지 검증합니다.
+
+- **대상 및 조건**
+  - 사내 프론트엔드 개발자 3명을 대상으로 진행합니다.
+  - 동일한 디자인 요구사항(버튼 스타일 가이드)을 제시하고, A/B 두 조건을 비교합니다.
+    - **A안 (기존 플로우)**: Figma 디자인 + 텍스트 스펙만 보고 손으로 Tailwind/스타일 코드를 작성.
+    - **B안 (본 웹앱 사용)**: `Design Token Handoff Studio`에서 토큰을 맞추고, 코드 추출 기능으로 버튼 코드를 복사해 프로젝트에 붙여넣기.
+
+- **측정 지표**
+  - 각 참가자별로 A/B 조건에서 **"요구된 버튼이 화면에 의도한 스타일로 렌더링될 때까지"의 총 소요 시간(분)**을 측정.
+  - A/B 간 평균 시간 차이, 성공률(요구된 스타일과의 일치도), 수정 횟수(리팩터링/재시도 횟수)를 기록.
+
+- **기대 결과**
+  - B안(웹앱 사용)이 A안 대비 **구현 시간 단축** 및 **스타일 일관성 향상**을 보여줄 경우, 본 툴을 팀 내 디자인 시스템 워크플로우에 정식으로 도입할 근거로 사용합니다.
+
+### 2. 디자인 검토: Figma 토큰과 코드 일치율 100% QA 프로세스
+
+- **목표**
+  - Figma에 정의된 디자인 토큰(예: `borderRadius`, `spacing.x`, `spacing.y`, `fontSize`, `primaryColor`, `textColor`)과 본 웹앱이 출력하는 Tailwind/스타일 코드 간의 **일치율 100%**를 달성하고 유지합니다.
+
+- **프로세스**
+  1. **참조 소스 정의**
+     - Figma 디자인 시스템 파일 내 버튼 컴포넌트에 사용된 토큰 값을 기준 진실 소스(source of truth)로 정의합니다.
+  2. **매핑 테이블 관리**
+     - Figma 토큰 이름과 본 웹앱 내 상태/프로퍼티(`radius`, `paddingX`, `paddingY`, `fontSize`, `bgColor`, `textColor`, `fontFamily`) 사이의 매핑 테이블을 문서화합니다.
+     - 예: `Figma.borderRadius.sm → radius = 8`, `Figma.font.body → fontFamily = "sans", fontSize = 14` 등.
+  3. **정기 QA 세션**
+     - 스프린트마다 최소 1회, 디자이너 1명 + 프론트엔드 개발자 1명이 함께 QA를 진행합니다.
+     - Figma에서 랜덤으로 버튼 스타일 5개 이상을 선택하고, 동일한 값을 웹앱에 입력한 뒤 **렌더링 결과와 추출된 코드가 Figma의 토큰 정의와 100% 일치하는지** 확인합니다.
+  4. **이슈 트래킹**
+     - 일치하지 않는 사례가 발견되면, 원인을 토큰 매핑 오류 / Tailwind 스케일 차이 / 브라우저 렌더링 차이 등으로 분류하여 이슈 트래커에 기록합니다.
+     - 수정 후에는 동일한 케이스에 대해 회귀 테스트를 수행해, 같은 문제가 재발하지 않도록 합니다.
+
+- **성과 측정**
+  - 각 QA 세션마다 **테스트 케이스 수 대비 일치율(%)**을 기록하고, 일치율이 100%에 수렴하도록 지속적으로 개선합니다.
+  - 해커톤 데모 단계에서는 최소 95% 이상, 프로덕션 도입 전까지 100% 달성을 목표로 합니다.
+
+## Future Roadmap (V2 업데이트 예정)
+
+- **Multi-state Button Comparison & Customization**
+  - Primary, Secondary, Tertiary, Disabled 등 여러 버튼 상태를 한 화면에서 동시에 비교할 수 있는 **Multi-state Canvas**를 도입할 예정입니다.
+  - 각 상태별로 독립된 디자인 토큰(색상, 테두리, 타이포, 상호작용)을 커스텀하고, 상태 간 일관성을 한눈에 검토할 수 있는 레이아웃을 제공합니다.
+  - 상태별 토큰 차이를 시각적으로 하이라이트하여, 디자인 시스템 차원에서 버튼 상태 전략을 수립하는 데 도움을 줍니다.
+
+- **Button Group Code Export (일괄 코드 추출)**
+  - Primary/Secondary/Destructive/Disabled 등의 상태를 포함한 **전체 버튼 그룹(Button Group)**을 한 번에 구성하고, 이를 단일 컴포넌트 세트로 추출하는 기능을 추가할 계획입니다.
+  - 단일 버튼 코드뿐 아니라, `ButtonGroup`, `Toolbar`, `Segmented Control` 등 실제 제품에 자주 등장하는 패턴을 **일괄 코드 스니펫(JSX + Tailwind + 토큰 오브젝트)** 형태로 복사할 수 있도록 설계합니다.
+  - 이를 통해 디자인 시스템 팀이 버튼 패밀리 전체를 한 번에 검토·배포하고, 제품 팀은 표준화된 버튼 그룹을 그대로 가져다 쓰는 **엔드 투 엔드(End-to-end) 핸드오프 경험**을 목표로 합니다.
