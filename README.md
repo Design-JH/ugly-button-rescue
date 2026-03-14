@@ -1,3 +1,9 @@
+# 🎨 Ugly Button Rescue
+
+### 🔗 서비스 바로가기
+**배포 URL**: https://ugly-button-rescue.vercel.app
+**저장소**: https://github.com/Design-JH/ugly-button-rescue
+
 # Design Token Handoff Studio
 
 > 디자이너와 개발자 간의 UI 컴포넌트 핸드오프(Handoff) 오차를 줄이고, 완벽한 단일 진실 공급원(SSOT)을 제공하는 디자인 토큰 스튜디오
@@ -45,12 +51,13 @@
 | 추상적인 디자인 명세 ("조금만 더 둥글게") | 구체적인 수치 (`border-radius: 12px`, `padding: 10px 20px`) |
 | 반복적인 핑퐁 커뮤니케이션과 해석 차이 | 토큰과 코드가 1:1로 매핑된 단일 진실 공급원(SSOT) |
 
-## 기술 스택
+## 🛠 기술 스택
 
 - **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS
-- **Language**: TypeScript
-- **State**: React Hooks (useState, useCallback)
+- **Styling**: Tailwind CSS 4.0
+- **Language**: TypeScript 5.0
+- **AI Model**: Anthropic Claude 3.5 Haiku
+- **Deployment**: Vercel
 
 ## 로컬 실행
 
