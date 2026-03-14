@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// 🚨 사내 보안망(SSL 검사) 강제 패스 (해커톤/로컬 전용)
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 
 export async function POST(req: Request) {
   try {
