@@ -91,7 +91,7 @@ export default function Home() {
     [radius, paddingX, paddingY, fontSize]
   );
 
-  onst handleGenerateName = async () => {
+  const handleGenerateName = async () => {
     // 로그 1: 함수가 실행되는지 확인
     console.log("🚀 버튼 클릭됨: AI 처방 시작!"); 
   
