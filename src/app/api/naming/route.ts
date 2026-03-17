@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { radius, paddingX, paddingY, fontSize, colorId } = await req.json();
+    const body = await req.json();
+    const { radius, paddingX, paddingY, fontSize, colorId } = body;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -14,46 +15,43 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: "claude-3-haiku-20240307",
         max_tokens: 100,
-        system: `You are a Senior Design System Architect. 
-        Construct a button component name using exactly this formula: 
-        [Action]-[Object]-[Context]-[Variant]-[Size]-[State]
+        system: `You are a Senior UI/UX Developer following the Korea Design System (KRDS) naming conventions. 
+        Your task is to generate a semantic button name.
         
-        Guidelines:
-        - Action: click, submit, open, etc.
-        - Object: button, cta, link
-        - Context: login, rescue, signup, global
-        - Variant: primary, secondary, outline, ghost (based on color/radius)
-        - Size: sm, md, lg, xl (based on padding/fontSize)
-        - State: default, hover, active
+        Formula: btn-[function]-[type]-[shape]-[size]-[state]
+        - btn: fixed prefix
+        - function: 'rescue' (default context)
+        - type: based on colorId (primary, secondary, outline)
+        - shape: based on radius (square: 0-4px, rounded: 5-12px, pill: 13px+)
+        - size: based on padding/fontSize (sm, md, lg)
+        - state: always 'normal' for generated result
         
-        Output ONLY the kebab-case string. No explanations.`,
+        Example: btn-rescue-primary-rounded-md-normal
+        Output ONLY the kebab-case string.`,
         messages: [
           { 
             role: "user", 
-            content: `Properties: Radius:${radius}px, Padding:${paddingY}px ${paddingX}px, FontSize:${fontSize}px, ColorID:${colorId}. 
-            Create a name following the formula.` 
+            content: `Button Specs: Radius ${radius}px, Padding ${paddingY}px ${paddingX}px, Font ${fontSize}px, ColorID ${colorId}.` 
           }
         ],
-        temperature: 0.7
+        temperature: 0.5
       }),
     });
 
     const data = await response.json();
 
     if (data.content && data.content[0]) {
-      // AI가 지어준 'click-button-rescue-primary-md-default' 형태의 이름을 반환
       return NextResponse.json({ name: data.content[0].text.trim() });
     }
 
-    throw new Error("API Path Error");
+    throw new Error("Invalid Response");
 
   } catch (error) {
-    // 실패 시에도 규칙에 맞춘 랜덤 이름을 생성하여 사용자에게 신뢰감을 줌
-    const actions = ["click", "submit", "open"];
-    const variants = radius > 10 ? "rounded" : "square";
-    const sizes = paddingX > 20 ? "lg" : "md";
+    // KRDS 규칙에 기반한 수동 조합 안전장치 (API 실패 시)
+    const shape = radius > 12 ? "pill" : radius > 4 ? "rounded" : "square";
+    const size = paddingX > 20 ? "lg" : "md";
     return NextResponse.json({ 
-      name: `${actions[Math.floor(Math.random()*3)]}-button-rescue-${variants}-${sizes}-default` 
+      name: `btn-rescue-primary-${shape}-${size}-normal` 
     });
   }
 }
