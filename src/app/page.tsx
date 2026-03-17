@@ -299,41 +299,36 @@ export default function Home() {
               </button>
             </div>
 
-            {/* KRDS 네이밍 명세서 섹션 */}
-{aiSuggestedName && (
-  <div className="mt-4 p-5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm">
-    <div className="flex items-center gap-2 mb-4">
-      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-      <h3 className="text-[10px] font-bold text-slate-400 tracking-tighter uppercase">
-        KRDS System Naming Spec
-      </h3>
-    </div>
-    
-    <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 mb-5 shadow-sm">
-      <code className="text-blue-600 font-mono text-base font-bold truncate pr-2">{aiSuggestedName}</code>
-      <button 
-        onClick={handleCopySuggestedName}
-        className="shrink-0 px-3 py-1.5 text-[10px] font-bold bg-slate-900 text-white rounded-lg hover:bg-blue-600 transition-colors"
-      >
-        {copyNameStatus === "복사됨! ✅" ? "COPIED" : "COPY NAME"}
-      </button>
-    </div>
+            {aiSuggestedName && (
+              <button
+                onClick={handleCopySuggestedName}
+                className="flex w-full items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-emerald-700 hover:bg-emerald-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase">AI Suggested Name</span>
+                  <span className="font-mono text-sm font-bold">{aiSuggestedName}</span>
+                </div>
+                <span className="text-[10px] opacity-70">{copyNameStatus}</span>
+              </button>
+            )}
 
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-      {['Prefix', 'Function', 'Type', 'Shape', 'Size', 'State'].map((label, idx) => {
-        const parts = aiSuggestedName.split('-');
-        return (
-          <div key={label} className="flex flex-col p-2.5 bg-white rounded-lg border border-slate-100 shadow-sm">
-            <span className="text-[9px] text-slate-400 uppercase font-black mb-1 tracking-tight">{label}</span>
-            <span className="text-xs font-bold text-slate-700 truncate">
-              {parts[idx] || (idx === 0 ? 'btn' : '-')}
-            </span>
+            <div className="rounded-lg bg-slate-900 p-4 text-xs text-slate-300 font-mono overflow-x-auto shadow-inner">
+              <pre>
+{`<button
+  className="${tailwindPreview}"
+  style={{
+    borderRadius: "${radius}px",
+    padding: "${paddingY}px ${paddingX}px",
+    fontSize: "${fontSize}px"
+  }}
+>
+  ${buttonText || "Button"}
+</button>`}
+              </pre>
+            </div>
           </div>
-        );
-      })}
-    </div>
-    <p className="mt-4 text-[10px] text-slate-400 text-center font-medium leading-relaxed">
-      본 명칭은 KRDS 유틸리티 명명 규칙에 따라 생성되었습니다.
-    </p>
-  </div>
-)}
+        </section>
+      </div>
+    </main>
+  );
+}
