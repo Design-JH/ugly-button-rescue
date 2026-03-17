@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     console.error("OpenAI API Error:", error);
     
     // 4. [중요] 에러가 나더라도 '400'을 띄우지 않고 가짜 이름을 보내서 
-    // 사용자 화면에서는 정상 작동하는 것처럼 보이게 합니다 (해커톤 필살기)
+    // 사용자 화면에서는 정상 작동하는 것처럼 보이게 합니다 
     return NextResponse.json({ name: "Rescue-Custom-Button" });
   }
 }
