@@ -38,252 +38,90 @@ export default function Home() {
   const [isGeneratingName, setIsGeneratingName] = useState(false);
   const [aiSuggestedName, setAiSuggestedName] = useState<string | null>(null);
 
-  // UX 개선: 복사 상태를 보여주기 위한 State들
   const [copyCodeStatus, setCopyCodeStatus] = useState("복사하기");
   const [copyNameStatus, setCopyNameStatus] = useState("클릭해서 복사");
 
-  const selectedBg = useMemo(
-    () => BG_COLORS.find((c) => c.id === colorId) ?? BG_COLORS[0],
-    [colorId]
-  );
-  const selectedTextColor = useMemo(
-    () => TEXT_COLORS.find((t) => t.id === textColorId) ?? TEXT_COLORS[0],
-    [textColorId]
-  );
-  const selectedFont = useMemo(
-    () => FONT_FAMILIES.find((f) => f.id === fontFamilyId) ?? FONT_FAMILIES[0],
-    [fontFamilyId]
-  );
+  const selectedBg = useMemo(() => BG_COLORS.find((c) => c.id === colorId) ?? BG_COLORS[0], [colorId]);
+  const selectedTextColor = useMemo(() => TEXT_COLORS.find((t) => t.id === textColorId) ?? TEXT_COLORS[0], [textColorId]);
+  const selectedFont = useMemo(() => FONT_FAMILIES.find((f) => f.id === fontFamilyId) ?? FONT_FAMILIES[0], [fontFamilyId]);
 
-  const buttonClasses = useMemo(
-    () =>
-      [
-        "inline-flex items-center justify-center",
-        "font-medium",
-        "shadow-md",
-        "transition-all duration-200 ease-out",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 focus-visible:ring-offset-white",
-      ].join(" "),
-    []
-  );
+  const buttonClasses = "inline-flex items-center justify-center font-medium shadow-md transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 focus-visible:ring-offset-white";
 
-  const tailwindPreview = useMemo(
-    () =>
-      [
-        "inline-flex items-center justify-center",
-        "font-medium",
-        "shadow-md",
-        selectedBg.className,
-        selectedTextColor.className,
-        selectedFont.className,
-        "transition-all duration-200 ease-out",
-      ].join(" "),
-    [selectedBg.className, selectedTextColor.className, selectedFont.className]
-  );
-
-  const buttonInlineStylePreview = useMemo(
-    () =>
-      `{
-  borderRadius: "${radius}px",
-  padding: "${paddingY}px ${paddingX}px",
-  fontSize: "${fontSize}px"
-}`,
-    [radius, paddingX, paddingY, fontSize]
-  );
+  const tailwindPreview = useMemo(() => [
+    "inline-flex items-center justify-center", "font-medium", "shadow-md",
+    selectedBg.className, selectedTextColor.className, selectedFont.className,
+    "transition-all duration-200 ease-out",
+  ].join(" "), [selectedBg.className, selectedTextColor.className, selectedFont.className]);
 
   const handleGenerateName = async () => {
-    // 로그 1: 함수가 실행되는지 확인
-    console.log("🚀 버튼 클릭됨: AI 처방 시작!"); 
-  
     setIsGeneratingName(true);
-    setAiSuggestedName(null);
-  
     try {
-      // 로그 2: 어떤 데이터를 보내는지 확인
-      console.log("📦 보낼 데이터:", { radius, paddingX, paddingY, fontSize, colorId });
-  
       const response = await fetch("/api/naming", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ radius, paddingX, paddingY, fontSize, colorId }),
       });
-  
-      // 로그 3: 서버의 응답 상태 확인 (200이 나오면 성공, 404면 경로 에러, 500이면 서버 에러)
-      console.log("📡 서버 응답 상태:", response.status);
-  
-      if (!response.ok) {
-        throw new Error("서버 응답이 좋지 않습니다.");
-      }
-  
       const data = await response.json();
-      
-      // 로그 4: AI가 지어준 이름 확인
-      console.log("✨ AI 추천 결과:", data.name);
-      
       setAiSuggestedName(data.name);
-  
     } catch (err) {
-      console.error("❌ 에러 발생:", err);
+      console.error(err);
     } finally {
       setIsGeneratingName(false);
     }
   };
 
-  // ✅ UX 개선: Alert 대신 버튼 텍스트 변경 피드백 (컴포넌트 이름 복사)
   const handleCopySuggestedName = async () => {
     if (!aiSuggestedName) return;
-    try {
-      await navigator.clipboard.writeText(aiSuggestedName);
-      setCopyNameStatus("복사됨! ✅");
-      setTimeout(() => setCopyNameStatus("클릭해서 복사"), 2000);
-    } catch {
-      console.error("이름 복사 실패");
-    }
+    await navigator.clipboard.writeText(aiSuggestedName);
+    setCopyNameStatus("복사됨! ✅");
+    setTimeout(() => setCopyNameStatus("클릭해서 복사"), 2000);
   };
 
-  // ✅ UX 개선: Alert 대신 버튼 텍스트 변경 피드백 (코드 복사)
   const handleCopy = async () => {
-    const copyText = `<button
-  className="${tailwindPreview}"
-  style={${buttonInlineStylePreview}}
->
-  ${buttonText || "Button"}
-</button>`;
-
-    try {
-      await navigator.clipboard.writeText(copyText);
-      setCopyCodeStatus("복사됨! ✅");
-      setTimeout(() => setCopyCodeStatus("복사하기"), 2000);
-    } catch {
-      console.error("복사 실패");
-    }
+    const copyText = `<button className="${tailwindPreview}" style={{ borderRadius: "${radius}px", padding: "${paddingY}px ${paddingX}px", fontSize: "${fontSize}px" }}> ${buttonText || "Button"} </button>`;
+    await navigator.clipboard.writeText(copyText);
+    setCopyCodeStatus("복사됨! ✅");
+    setTimeout(() => setCopyCodeStatus("복사하기"), 2000);
   };
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 font-sans text-slate-900">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 md:p-8 lg:flex-row lg:gap-8">
-        <section className="w-full space-y-6 lg:w-1/2" aria-label="Token Controllers">
+        <section className="w-full space-y-6 lg:w-1/2">
           <header className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-              Design Token Handoff Studio
-            </p>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
-              Design Token Studio
-            </h1>
-            <p className="text-sm text-slate-500">
-              디자이너와 개발자 간 UI 컴포넌트 핸드오프 오차를 줄이는 단일 진실 공급원(SSOT) 툴입니다.
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Design Token Handoff Studio</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Design Token Studio</h1>
+            <p className="text-sm text-slate-500">KRDS 가이드라인을 준수하는 버튼 핸드오프 시스템입니다.</p>
           </header>
 
           <div className="space-y-5 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
-            <div className="space-y-1">
-              <div className="text-xs font-medium text-slate-600">Button Label</div>
-              <input
-                type="text"
-                value={buttonText}
-                onChange={(e) => setButtonText(e.target.value)}
-                placeholder="Primary Button"
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-slate-900"
-              />
+            <div className="space-y-1 text-xs font-medium text-slate-600">Button Label
+              <input type="text" value={buttonText} onChange={(e) => setButtonText(e.target.value)} className="w-full mt-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-900" />
             </div>
-
-            {/* 둥글기 컨트롤러 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-600">
-                <span>둥글기 (Radius)</span>
-                <span>{radius}px</span>
-              </div>
-              <input
-                type="range" min={0} max={32} value={radius}
-                onChange={(e) => setRadius(Number(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-slate-900"
-                aria-label="Border Radius"
-              />
+            <div className="space-y-2 text-xs font-medium text-slate-600 flex flex-col">
+              <div className="flex justify-between"><span>Radius</span><span>{radius}px</span></div>
+              <input type="range" min={0} max={32} value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="h-2 w-full appearance-none rounded-full bg-slate-200 accent-slate-900" />
             </div>
-
-            {/* 가로 여백 컨트롤러 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-600">
-                <span>가로 여백 (Padding X)</span>
-                <span>{paddingX}px</span>
-              </div>
-              <input
-                type="range" min={8} max={48} value={paddingX}
-                onChange={(e) => setPaddingX(Number(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-slate-900"
-                aria-label="Padding Horizontal"
-              />
+            <div className="space-y-2 text-xs font-medium text-slate-600 flex flex-col">
+              <div className="flex justify-between"><span>Padding X</span><span>{paddingX}px</span></div>
+              <input type="range" min={8} max={48} value={paddingX} onChange={(e) => setPaddingX(Number(e.target.value))} className="h-2 w-full appearance-none rounded-full bg-slate-200 accent-slate-900" />
             </div>
-
-            {/* 세로 여백 컨트롤러 */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-600">
-                <span>세로 여백 (Padding Y)</span>
-                <span>{paddingY}px</span>
-              </div>
-              <input
-                type="range" min={4} max={24} value={paddingY}
-                onChange={(e) => setPaddingY(Number(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-slate-900"
-                aria-label="Padding Vertical"
-              />
+            <div className="space-y-2 text-xs font-medium text-slate-600 flex flex-col">
+              <div className="flex justify-between"><span>Padding Y</span><span>{paddingY}px</span></div>
+              <input type="range" min={4} max={24} value={paddingY} onChange={(e) => setPaddingY(Number(e.target.value))} className="h-2 w-full appearance-none rounded-full bg-slate-200 accent-slate-900" />
             </div>
-
-            {/* 폰트 선택 */}
-            <div className="space-y-2">
-              <div className="text-xs font-medium text-slate-600">Font Family</div>
-              <div className="flex gap-2">
-                {FONT_FAMILIES.map((font) => (
-                  <button
-                    key={font.id}
-                    onClick={() => setFontFamilyId(font.id as any)}
-                    className={`rounded-lg border px-3 py-2 text-xs font-medium ${fontFamilyId === font.id ? "bg-slate-900 text-white" : "bg-white"}`}
-                  >
-                    {font.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 컬러 팔레트 */}
-            <div className="space-y-2">
-              <div className="text-xs font-medium text-slate-600">Color Palette</div>
-              <div className="flex flex-wrap gap-2">
-                {BG_COLORS.map((color) => (
-                  <button
-                    key={color.id}
-                    onClick={() => setColorId(color.id)}
-                    className={`h-8 w-8 rounded-full border-2 ${color.className.split(" ")[0]} ${colorId === color.id ? "border-slate-900 ring-2 ring-offset-2" : "border-slate-200"}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* AI 네이밍 버튼 */}
             <div className="mt-6 border-t border-dashed border-slate-200 pt-4 flex items-center justify-between">
               <p className="text-xs font-medium text-slate-600">✨ AI Naming Assistant</p>
-              <button
-                onClick={handleGenerateName}
-                disabled={isGeneratingName}
-                className="rounded-full bg-slate-900 px-4 py-1.5 text-xs text-white disabled:opacity-50"
-              >
+              <button onClick={handleGenerateName} disabled={isGeneratingName} className="rounded-full bg-slate-900 px-4 py-1.5 text-xs text-white disabled:opacity-50">
                 {isGeneratingName ? "생성 중..." : "AI 추천 받기"}
               </button>
             </div>
           </div>
         </section>
 
-        {/* 프리뷰 섹션 */}
-        <section className="w-full space-y-6 lg:w-1/2" aria-label="Live Preview">
+        <section className="w-full space-y-6 lg:w-1/2">
           <div className="flex flex-col items-center justify-center gap-8 rounded-xl bg-slate-50 p-10 ring-1 ring-slate-200">
-            <button
-              style={{
-                borderRadius: `${radius}px`,
-                padding: `${paddingY}px ${paddingX}px`,
-                fontSize: `${fontSize}px`,
-              }}
-              className={`${buttonClasses} ${selectedBg.className} ${selectedTextColor.className} ${selectedFont.className}`}
-            >
+            <button style={{ borderRadius: `${radius}px`, padding: `${paddingY}px ${paddingX}px`, fontSize: `${fontSize}px` }} className={`${buttonClasses} ${selectedBg.className} ${selectedTextColor.className} ${selectedFont.className}`}>
               {buttonText || "Button"}
             </button>
           </div>
@@ -291,53 +129,42 @@ export default function Home() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Export Code</p>
-              <button
-                onClick={handleCopy}
-                className="rounded-full bg-slate-900 px-4 py-1.5 text-xs text-white hover:bg-slate-800 transition-all"
-              >
-                {copyCodeStatus}
-              </button>
+              <button onClick={handleCopy} className="rounded-full bg-slate-900 px-4 py-1.5 text-xs text-white hover:bg-slate-800 transition-all">{copyCodeStatus}</button>
             </div>
 
-            {/* AI 추천 이름 출력 섹션 */}
-{aiSuggestedName && (
-  <div className="mt-4 p-5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
-    <div className="flex items-center gap-2 mb-4">
-      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-      <h3 className="text-[10px] font-bold text-slate-400 tracking-tighter uppercase">
-        KRDS System Naming Spec
-      </h3>
-    </div>
-    
-    {/* 메인 이름 출력 및 복사 */}
-    <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 mb-5 group transition-all hover:border-blue-300 shadow-sm">
-      <code className="text-blue-600 font-mono text-base font-bold truncate pr-2">{aiSuggestedName}</code>
-      <button 
-        onClick={handleCopySuggestedName}
-        className="shrink-0 px-3 py-1.5 text-[10px] font-bold bg-slate-900 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
-      >
-        {copyNameStatus === "복사됨! ✅" ? "COPIED" : "COPY NAME"}
-      </button>
-    </div>
+            {/* AI Naming Spec UI */}
+            {aiSuggestedName && (
+              <div className="mt-4 p-5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm transition-all duration-500">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                  <h3 className="text-[10px] font-bold text-slate-400 tracking-tighter uppercase">KRDS System Naming Spec</h3>
+                </div>
+                <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 mb-5 shadow-sm">
+                  <code className="text-blue-600 font-mono text-base font-bold truncate pr-2">{aiSuggestedName}</code>
+                  <button onClick={handleCopySuggestedName} className="shrink-0 px-3 py-1.5 text-[10px] font-bold bg-slate-900 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    {copyNameStatus === "복사됨! ✅" ? "COPIED" : "COPY NAME"}
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {['Prefix', 'Function', 'Type', 'Shape', 'Size', 'State'].map((label, idx) => {
+                    const parts = aiSuggestedName.split('-');
+                    return (
+                      <div key={label} className="flex flex-col p-2.5 bg-white rounded-lg border border-slate-100 shadow-sm">
+                        <span className="text-[9px] text-slate-400 uppercase font-black mb-1 tracking-tight">{label}</span>
+                        <span className="text-xs font-bold text-slate-700 truncate">{parts[idx] || (idx === 0 ? 'btn' : '-')}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-    {/* KRDS 규칙별 분해 칩 (6단계) */}
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-      {['Prefix', 'Function', 'Type', 'Shape', 'Size', 'State'].map((label, idx) => {
-        const parts = aiSuggestedName.split('-');
-        return (
-          <div key={label} className="flex flex-col p-2.5 bg-white rounded-lg border border-slate-100 shadow-[0_1px_2px_rgba(0,0,0,0,0.05)]">
-            <span className="text-[9px] text-slate-400 uppercase font-black mb-1 tracking-tight">{label}</span>
-            <span className="text-xs font-bold text-slate-700 truncate">
-              {parts[idx] || (idx === 0 ? 'btn' : '-')}
-            </span>
+            <div className="rounded-lg bg-slate-900 p-4 text-xs text-slate-300 font-mono overflow-x-auto shadow-inner">
+              <pre>{`<button className="${tailwindPreview}" style={{ borderRadius: "${radius}px", padding: "${paddingY}px ${paddingX}px", fontSize: "${fontSize}px" }}> ${buttonText || "Button"} </button>`}</pre>
+            </div>
           </div>
-        );
-      })}
-    </div>
-    
-    <p className="mt-4 text-[10px] text-slate-400 text-center font-medium leading-relaxed">
-      본 명칭은 <span className="text-slate-600 font-bold underline decoration-slate-200">KRDS 유틸리티 명명 규칙</span>에 따라<br/> 
-      AI가 실시간으로 생성한 디자인 시스템 컴포넌트 규격입니다.
-    </p>
-  </div>
-)}
+        </section>
+      </div>
+    </main>
+  );
+}
