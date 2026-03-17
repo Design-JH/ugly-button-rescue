@@ -15,26 +15,14 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: "claude-3-haiku-20240307",
         max_tokens: 100,
-        system: `You are a Senior UI/UX Developer following the Korea Design System (KRDS) naming conventions. 
-        Your task is to generate a semantic button name.
-        
-        Formula: btn-[function]-[type]-[shape]-[size]-[state]
-        - btn: fixed prefix
-        - function: 'rescue' (default context)
-        - type: based on colorId (primary, secondary, outline)
-        - shape: based on radius (square: 0-4px, rounded: 5-12px, pill: 13px+)
-        - size: based on padding/fontSize (sm, md, lg)
-        - state: always 'normal' for generated result
-        
-        Example: btn-rescue-primary-rounded-md-normal
-        Output ONLY the kebab-case string.`,
+        system: "You are a Senior UI Developer following KRDS naming conventions. Formula: btn-[function]-[type]-[shape]-[size]-[state]. Output ONLY the kebab-case string.",
         messages: [
           { 
             role: "user", 
-            content: `Button Specs: Radius ${radius}px, Padding ${paddingY}px ${paddingX}px, Font ${fontSize}px, ColorID ${colorId}.` 
+            content: `Specs: Radius ${radius}px, Padding ${paddingY}px ${paddingX}px, Font ${fontSize}px, ColorID ${colorId}.` 
           }
         ],
-        temperature: 0.5
+        temperature: 0.3
       }),
     });
 
@@ -44,14 +32,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ name: data.content[0].text.trim() });
     }
 
-    throw new Error("Invalid Response");
+    // 데이터 구조가 예상과 다를 때 실행될 안전장치
+    return NextResponse.json({ name: `btn-rescue-primary-rounded-md-normal` });
 
   } catch (error) {
-    // KRDS 규칙에 기반한 수동 조합 안전장치 (API 실패 시)
-    const shape = radius > 12 ? "pill" : radius > 4 ? "rounded" : "square";
-    const size = paddingX > 20 ? "lg" : "md";
-    return NextResponse.json({ 
-      name: `btn-rescue-primary-${shape}-${size}-normal` 
-    });
+    // 에러 발생 시(API 실패 포함) 실행될 최후의 보루
+    return NextResponse.json({ name: "btn-rescue-action-normal-md-default" });
   }
 }
