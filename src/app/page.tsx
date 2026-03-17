@@ -91,32 +91,39 @@ export default function Home() {
     [radius, paddingX, paddingY, fontSize]
   );
 
-  const handleGenerateName = async () => {
-    if (isGeneratingName) return;
+  onst handleGenerateName = async () => {
+    // 로그 1: 함수가 실행되는지 확인
+    console.log("🚀 버튼 클릭됨: AI 처방 시작!"); 
+  
     setIsGeneratingName(true);
     setAiSuggestedName(null);
-
+  
     try {
+      // 로그 2: 어떤 데이터를 보내는지 확인
+      console.log("📦 보낼 데이터:", { radius, paddingX, paddingY, fontSize, colorId });
+  
       const response = await fetch("/api/naming", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          radius, paddingX, paddingY, fontSize,
-          colorId, textColorId, fontFamilyId, buttonText,
-        }),
+        body: JSON.stringify({ radius, paddingX, paddingY, fontSize, colorId }),
       });
-
+  
+      // 로그 3: 서버의 응답 상태 확인 (200이 나오면 성공, 404면 경로 에러, 500이면 서버 에러)
+      console.log("📡 서버 응답 상태:", response.status);
+  
       if (!response.ok) {
-        console.error("AI 네이밍 추천 실패");
-        return;
+        throw new Error("서버 응답이 좋지 않습니다.");
       }
-
-      const data = (await response.json()) as { name?: string };
-      if (data.name) {
-        setAiSuggestedName(data.name);
-      }
+  
+      const data = await response.json();
+      
+      // 로그 4: AI가 지어준 이름 확인
+      console.log("✨ AI 추천 결과:", data.name);
+      
+      setAiSuggestedName(data.name);
+  
     } catch (err) {
-      console.error("AI API 호출 중 에러 발생:", err);
+      console.error("❌ 에러 발생:", err);
     } finally {
       setIsGeneratingName(false);
     }
